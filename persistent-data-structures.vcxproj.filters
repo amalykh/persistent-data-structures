@@ -13,5 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\PersistentVector">
+      <UniqueIdentifier>{530f7127-831c-43d3-9725-c632b0f4f7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shared">
+      <UniqueIdentifier>{edf67dd9-e3a6-40e6-bb4b-d00876d42a85}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="shared.h">
+      <Filter>Source Files\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="tail_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="data_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_persistent_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="reference_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractPV.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

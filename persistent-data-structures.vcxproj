@@ -110,6 +110,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractPV.h" />
+    <ClInclude Include="data_node.h" />
+    <ClInclude Include="reference_node.h" />
+    <ClInclude Include="shared.h" />
+    <ClInclude Include="tail_node.h" />
+    <ClInclude Include="vector_persistent_node.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

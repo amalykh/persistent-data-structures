@@ -1,6 +1,8 @@
 #include <iostream>
 #include "tail_node.h"
 #include "shared.h"
+#include "data_node.h"
+#include "reference_node.h"
 
 using namespace std;
 using namespace persistent;

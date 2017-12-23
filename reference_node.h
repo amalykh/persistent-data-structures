@@ -7,33 +7,36 @@
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>
 	class ReferenceNode : public PersistentNode<T, Allocator> {
+		using RefNodePtr = ReferenceNode<T, Allocator>*;
+		using RefNode = ReferenceNode<T, Allocator>;
 		ReferenceNode(VersionID version) : version(version) {}
 		ReferenceNode(VersionID version, int size) : ReferenceNode(version) {
 			references.resize(size);
 		}
-		ReferenceNode<T, Allocator> CreateWithItems(VersionID version, std::vector<PersistentNode<T, Allocator>, Allocator> nodes) {
-			auto res = ReferenceNode<T, Allocator>(version);
-			res.setReferences(nodes);
+		RefNodePtr CreateWithItems(VersionID version, std::vector<PersistentNode<T, Allocator>, Allocator> nodes) {
+			RefNodePtr res = make_shared<RefNode>(version);
+			res->setReferences(nodes);
 			return res;
 		}
 		ReferenceNode<T, Allocator>& operator[] (int x) {
 			return references[x];
 		}
-		ReferenceNode<T, Allocator> pop(VersionID version) {
+		RefNodePtr pop(VersionID version) {
 			assert(!references.empty());
-			auto cp = ReferenceNode<T, Allocator>(version, references.size() - 1);
-			cp.setReferences(references);
+			auto cp = make_shared<RefNode>(version, references.size() - 1);
+			cp->setReferences(references);
 			return cp;
 		}
-		ReferenceNode<T, Allocator> change(int ind, std::vector<T, Allocator>* value, VersionID version) {
+		RefNodePtr change(int ind, std::vector<T, Allocator>* value, VersionID version) {
 			if (value == nullptr && ind + 1 == references.size()) return pop(version);
 			if (version != NO_VERSION && this->version == version && ind < references.size()) {
 				references[ind] = *value;
+				return make_shared<RefNode>(*this);
 			}
 			auto size = (ind < references.size()) ? references.size() : ind + 1;
-			auto cp = ReferenceNode<T, Allocator>(version, size);
-			cp.setReferences(references);
-			cp[ind] = value;
+			auto cp = make_shared<RefNode>(version, size);
+			cp->setReferences(references);
+			(*cp)[ind] = value;
 			return cp;
 		}
 		std::vector<T, Allocator>& getReferences() { return references; }

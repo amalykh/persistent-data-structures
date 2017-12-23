@@ -5,7 +5,9 @@
 
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>
-	class DataNode : public PersistentNode {
+	class DataNode : public PersistentNode<T, Allocator> {
+		using DNodePtr = DataNode<T, Allocator>*;
+		using DNode = DataNode<T, Allocator>;
 		DataNode(std::vector<T, Allocator>& source_data, VersionID version) : version(version) {
 			data = source_data;
 		}
@@ -13,12 +15,12 @@ namespace persistent {
 			DataNode(source_data, version) {
 			data[idx] = T;
 		}
-		DataNode<T> change(int ind, T& value, VersionID version = NO_VERSION) {
+		DNodePtr change(int ind, T& value, VersionID version = NO_VERSION) {
 			if (version != NO_VERSION && this->version == version) {
 				data[ind] = value;
-				return *this;
+				return make_shared<DNode>(*this);
 			}
-			return new DataNode<T>(data, ind, value, version);
+			return make_shared<DNode>(data, ind, value, version);
 		}
 	private:
 		std::vector<T, Allocator> data;
