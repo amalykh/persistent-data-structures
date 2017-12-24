@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include "tail_node.h"
 #include "shared.h"
@@ -11,19 +12,21 @@ using namespace std;
 using namespace persistent;
 
 int main() {
+	freopen("output.txt", "w", stdout);
 	PersistentVector<int> a = PersistentVector<int>::getEmpty();
-	auto b = a;
-	auto t = a;
-	for (int i = 0; i < 900; i++) {
-		if (i == 450) {
-			t = b;
-		}
-		b = b.push_back(i);
-	}
-	Log::toString(t);
+	PersistentVector<double> k(100);
+	Log::toString(k);
 	cout << endl;
-	Log::toString(b);
-	int w;
-	cin >> w;
+	const int n = 100000;
+	const int D = 10;
+	vector<PersistentVector<int>> v(D, PersistentVector<int>::getEmpty());
+	for (int i = 0; i < D; i++) v[i] = a;
+	for (int i = 0; i < n; i++) {
+		v[rand() % D] = v[rand() % D].push_back(rand());
+	}
+	for (int j = 0; j < D; j++) {
+		Log::toString(v[j]);
+		std::cout << endl;
+	}
 	return 0;
 }

@@ -19,7 +19,7 @@ namespace persistent {
 		using RefNode = ReferenceNode<T, Allocator>;
 		using RefNodePtr = shared_ptr<RefNode>;
 		using DNode = DataNode<T, Allocator>;
-		using DNodePtr = shared_ptr<DNode>;c
+		using DNodePtr = shared_ptr<DNode>;
 		using PV = PersistentVector<T, Allocator>;
 	public:
 
@@ -28,6 +28,11 @@ namespace persistent {
 
 		static PersistentVector getEmpty() {
 			return PV(nullptr, 0, 0, nullptr);
+		}
+
+		PersistentVector(size_t sz) : PV(nullptr, 0, 0, nullptr) {
+			// TODO: this must be done using transient arrays!
+			for (int i = 0; i < sz; i++) (*this) = this->push_back(T());
 		}
 
 		PV push_back(T value) {
@@ -59,6 +64,32 @@ namespace persistent {
 				(addTail(static_pointer_cast<RefNode>(root), NodesConverter<T, Allocator>::toDataNode(tail, version), depth * C_BITS));
 			return PV(new_root, count + 1, depth, make_shared<TNode>(value, version));
 		}
+		PV pop_back() {
+			assert(count);
+			if (count == 1) return getEmpty();
+			if (count % 32 != 1) return PV(root, count - 1, depth, tail);
+			auto new_tail = getNodeAt(count - 2);
+			auto new_root = removeTail(depth * C_BITS, root);
+			auto new_depth = depth;
+			if (depth > 1 && static_pointer_cast<RefNode>(new_root)->size() == 1) {
+				new_root = (*static_pointer_cast<RefNode>(new_root))[0];
+				--new_depth;
+			}
+			return PV(new_root, count - 1, new_depth, NodesConverter<T, Allocator>::toTailNode(new_tail, version));
+		}
+		PV setAt(int index, T val) {
+			assert(index >= 0 && index < count);
+			if (index >= getTailOffset()) return PV(root, count, depth, tail->change(index & ABITS, val, version));
+			if (dynamic_pointer_cast<DNode>(root)) {
+				return PV((static_pointer_cast<DNode>(root))->change(index & ABITS, val), count,
+					depth, tail);
+			}
+			return PV(changeValue(depth * C_BITS, static_pointer_cast<RefNode>(root), index, val), count,
+				depth, tail);
+		}
+		/*~PersistentVector() {
+			cout << "awa";
+		}*/
 	private:
 	};
 

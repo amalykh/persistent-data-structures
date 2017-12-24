@@ -36,15 +36,15 @@ namespace persistent {
 		PersNodePtr removeTail(int level, PersNodePtr node) {
 			int subix = ((count - 2) >> level) & ABITS;
 			if (level > C_BITS) {
-				RefNodePtr ref_node = RefNodePtr((RefNode*)node->_Ptr);
+				RefNodePtr ref_node = static_pointer_cast<RefNode>(node);
 				auto new_child = removeTail(level - C_BITS, (*ref_node)[subix]);
 				if (new_child == nullptr && subix == 0) return nullptr;
-				else return x = ref_node->change(subix, new_child, version);
+				else return ref_node->change(subix, new_child, version);
 			}
 			else if (subix == 0) return nullptr;
 			else {
-				if (dynamic_cast<RefNode*>(node->_Ptr) == nullptr) return nullptr;
-				RefNodePtr ref_node = RefNodePtr((RefNode*)node->_Ptr);
+				if ((dynamic_pointer_cast<RefNode>(node)) == NULL) return nullptr;
+				RefNodePtr ref_node = static_pointer_cast<RefNode>(node);
 				return ref_node->pop(version);
 			}
 		}
@@ -63,24 +63,24 @@ namespace persistent {
 				}
 			}
 		}
-		PersNodePtr changeValue(int level, PersNodePtr node, int ind, T& val) {
-			int subidx = (index >> level) & ABITS;
+		PersNodePtr changeValue(int level, RefNodePtr node, int ind, T& val) {
+			int subidx = (ind >> level) & ABITS;
 			if (level == C_BITS) {
-				return node->change(subidx,
-					((DNodePtr)node[subidx])->change(index & ABITS, value, version), version);
+				auto temp = static_pointer_cast<DNode>((*node)[subidx]);
+				return node->change(subidx, temp->change(ind & ABITS, val, version), version);
 			}
-			auto sub = (RefNodePtr)node[subidx];
-			auto changedVal = changeValue(level - C_BITS, sub, index, val);
-			if (changedVal == sub) return node;
+			auto sub = static_pointer_cast<RefNode>((*node)[subidx]);
+			auto changedVal = changeValue(level - C_BITS, sub, ind, val);
+			//if (changedVal == sub) return node;
 			return node->change(subidx, changedVal, version);
 		}
 		DNodePtr getNodeAt(int index) {
 			assert(!(index < 0 || index >= count));
 			auto node = root;
 			for (int lvl = depth * 5; lvl > 0; lvl -= C_BITS) {
-				node = ((RefNodePtr)node)[(index >> lvl) & ABITS];
+				node = (*(static_pointer_cast<RefNode>(node)))[(index >> lvl) & ABITS];
 			}
-			return shared_ptr<DNode>((DNode*)node._Ptr);
+			return (static_pointer_cast<DNode>(node));
 		}
 		PersNodePtr newPath(int level, PersNodePtr node) {
 			if (level == 0) return node;
@@ -103,6 +103,7 @@ namespace persistent {
 			return (*(static_pointer_cast<DNode>(node)))[index & ABITS];
 		}
 		int32_t size() { return count; }
+		virtual ~AbstractPV() {}
 	protected:
 		PersNodePtr root;
 		int32_t count;

@@ -17,7 +17,7 @@ namespace persistent {
 		}
 		DataNode(std::vector<T, Allocator>& source_data, int ind, T& value, VersionID version) :
 			DataNode(source_data, version) {
-			data[idx] = T;
+			data[ind] = value;
 		}
 		DNodePtr change(int ind, T& value, VersionID version = NO_VERSION) {
 			if (version != NO_VERSION && this->version == version) {
@@ -26,6 +26,8 @@ namespace persistent {
 			}
 			return make_shared<DNode>(data, ind, value, version);
 		}
+		std::vector<T, Allocator>& getData() { return data; }
+		virtual ~DataNode() {}
 	private:
 		std::vector<T, Allocator> data;
 		VersionID version;

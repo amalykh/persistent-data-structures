@@ -15,6 +15,7 @@ namespace persistent {
 		}
 		TailNode(VersionID version) : version(version) {
 			data.resize(C_SIZE);
+			last_change = 0;
 		}
 		TailNode(T first_val, VersionID version) : TailNode(version) {
 			data[0] = first_val;
@@ -48,14 +49,14 @@ namespace persistent {
 		}
 		TNodePtr change(int ind, T& value, VersionID version) {
 			if (version != NO_VERSION && this->version == version) {
-				data[ind] = T;
+				data[ind] = value;
 				return make_shared<TNode>(*this);
 			}
 			return make_shared<TNode>(data, last_change + 1, ind, value, version);
 		}
 		TNodePtr pop(VersionID version, int cnt) {
 			if (version != NO_VERSION && this.version == version) {
-				last_change--;
+				--last_change;
 				return make_shared<TNode>(*this);
 			}
 			return make_shared<TNode>(data, cnt - 1, version);
@@ -67,8 +68,10 @@ namespace persistent {
 			}
 			return true;
 		}
+		void setLastChanged(int32_t t) { last_change = t; }
 		std::vector<T, Allocator> getData() { return data; }
 		VersionID getVersion() { return version; }
+		~TailNode() {}
 	private:
 		VersionID version;
 		int32_t last_change;

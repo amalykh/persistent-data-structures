@@ -45,6 +45,7 @@ namespace persistent {
 		std::vector<PersNodePtr>& getReferences() { return references; }
 		void setReferences(std::vector<PersNodePtr> refs) { references = refs; }
 		int32_t size() { return references.size(); }
+		~ReferenceNode() {}
 	private:
 		std::vector<PersNodePtr> references;
 		VersionID version;
