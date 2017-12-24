@@ -19,7 +19,7 @@ namespace persistent {
 		using RefNode = ReferenceNode<T, Allocator>;
 		using RefNodePtr = shared_ptr<RefNode>;
 		using DNode = DataNode<T, Allocator>;
-		using DNodePtr = shared_ptr<DNode>;
+		using DNodePtr = shared_ptr<DNode>;c
 		using PV = PersistentVector<T, Allocator>;
 	public:
 
@@ -31,10 +31,15 @@ namespace persistent {
 		}
 
 		PV push_back(T value) {
+			// initializing PV with one element
 			if (count == 0) return PV(nullptr, 1, 0, make_shared<TNode>(value, NO_VERSION));
+			
+			// adding element to tail if it is possible
 			if (!isTailFull()) {
 				return PV(root, count + 1, depth, tail->push(value, count & ABITS, version));
 			}
+
+			// if all levels with this depth are filled, need to add next depth level
 			if (isFull()) {
 				auto new_tail = make_shared<TNode>(value, version);
 				auto old_tail = NodesConverter<T, Allocator>::toDataNode(tail, version);
@@ -49,8 +54,9 @@ namespace persistent {
 				}
 				return PV(RefNode::createWithItems(version, r), count + 1, depth + 1, new_tail);
 			}
+			// we have space in tree, but tail is full - copy info from tail
 			PersNodePtr new_root = (root == nullptr) ? (NodesConverter<T, Allocator>::toDataNode(tail, version)) :
-				(addTail(static_pointer_cast<RefNode>(root), NodesConverter<T, Allocator>::toDataNode(tail, version), depth * 5));
+				(addTail(static_pointer_cast<RefNode>(root), NodesConverter<T, Allocator>::toDataNode(tail, version), depth * C_BITS));
 			return PV(new_root, count + 1, depth, make_shared<TNode>(value, version));
 		}
 	private:

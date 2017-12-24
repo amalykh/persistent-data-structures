@@ -32,19 +32,19 @@ namespace persistent {
 			last_change = len - 1;
 		}
 		TNodePtr push(T& value, int ind, VersionID version) {
-			if (versionID != null && this.versionID == version) {
+			if (version != NO_VERSION && this->version == version) {
 				++last_change;
 				data[ind] = value;
 				return make_shared<TNode>(*this);
 			}
 
 			// this is not thread-safe!
-			if (idx == lastModified + 1) {
-				data[++lastModified] = value;
+			if (ind == last_change + 1) {
+				data[++last_change] = value;
 				return make_shared<TNode>(*this);
 			}
 
-			return make_shared<TNode>(data, idx + 1, idx, item, version);
+			return make_shared<TNode>(data, ind + 1, ind, value, version);
 		}
 		TNodePtr change(int ind, T& value, VersionID version) {
 			if (version != NO_VERSION && this->version == version) {
@@ -55,7 +55,7 @@ namespace persistent {
 		}
 		TNodePtr pop(VersionID version, int cnt) {
 			if (version != NO_VERSION && this.version == version) {
-				lastModified--;
+				last_change--;
 				return make_shared<TNode>(*this);
 			}
 			return make_shared<TNode>(data, cnt - 1, version);
@@ -67,7 +67,8 @@ namespace persistent {
 			}
 			return true;
 		}
-		std::vector<T, Allocator> getData() { return data; };
+		std::vector<T, Allocator> getData() { return data; }
+		VersionID getVersion() { return version; }
 	private:
 		VersionID version;
 		int32_t last_change;

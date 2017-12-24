@@ -110,8 +110,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AbstractPV.h" />
+    <ClInclude Include="abstract_pv.h" />
     <ClInclude Include="data_node.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="nodes_converter.h" />
+    <ClInclude Include="persistent_vector.h" />
     <ClInclude Include="reference_node.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="tail_node.h" />

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <memory>
+#include <algorithm>
 
 using std::shared_ptr;
 using std::make_shared;

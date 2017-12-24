@@ -27,7 +27,9 @@ namespace persistent {
 		int32_t getCount() { return count; }
 
 		AbstractPV(PersNodePtr root, int32_t count, int32_t depth, TNodePtr tail) :
-			root(root), count(count), depth(depth), tail(tail) {}
+			root(root), count(count), depth(depth), tail(tail) {
+			version = NO_VERSION;
+		}
 		// TODO: add build conversion from list
 
 		// Auxilary methods
@@ -62,7 +64,7 @@ namespace persistent {
 			}
 		}
 		PersNodePtr changeValue(int level, PersNodePtr node, int ind, T& val) {
-			int subidx = (index >> level) & C_BITS;
+			int subidx = (index >> level) & ABITS;
 			if (level == C_BITS) {
 				return node->change(subidx,
 					((DNodePtr)node[subidx])->change(index & ABITS, value, version), version);
@@ -93,12 +95,12 @@ namespace persistent {
 		}
 		T& getAt(int index) {
 			assert(index >= 0 && index < count);
-			if (index >= getTailOffset()) return tail[index & ABITS];
+			if (index >= getTailOffset()) return (*tail)[index & ABITS];
 			auto node = root;
 			for (int lvl = depth * C_BITS; lvl > 0; lvl -= C_BITS) {
-				node = (*static_pointer_cast<RefNode>node->_Ptr)[(index >> lvl) & ABITS];
+				node = (*static_pointer_cast<RefNode>(node))[(index >> lvl) & ABITS];
 			}
-			return (*static_pointer_cast<DNode>)[index & C_BITS];
+			return (*(static_pointer_cast<DNode>(node)))[index & ABITS];
 		}
 		int32_t size() { return count; }
 	protected:

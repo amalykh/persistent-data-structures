@@ -8,6 +8,7 @@ namespace persistent {
 	class DataNode : public PersistentNode<T, Allocator> {
 		using DNode = DataNode<T, Allocator>;
 		using DNodePtr = shared_ptr<DNode>;
+	public:
 		T& operator[] (int x) {
 			return data[x];
 		}

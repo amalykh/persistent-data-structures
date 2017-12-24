@@ -11,6 +11,7 @@ namespace persistent {
 		using PersNodePtr = shared_ptr<PersNode>;
 		using RefNode = ReferenceNode<T, Allocator>;
 		using RefNodePtr = shared_ptr<RefNode>;
+	public:
 		ReferenceNode(VersionID version) : version(version) {}
 		ReferenceNode(VersionID version, int size) : ReferenceNode(version) {
 			references.resize(size);
@@ -20,24 +21,24 @@ namespace persistent {
 			res->setReferences(nodes);
 			return res;
 		}
-		ReferenceNode<T, Allocator>& operator[] (int x) {
+		PersNodePtr& operator[] (int x) {
 			return references[x];
 		}
 		RefNodePtr pop(VersionID version) {
 			assert(!references.empty());
-			auto cp = make_shared<RefNode>(version, references.size() - 1);
+			auto cp = make_shared<RefNode>(version, size() - 1);
 			cp->setReferences(references);
 			return cp;
 		}
 		RefNodePtr change(int ind, PersNodePtr value, VersionID version) {
 			if (value == nullptr && ind + 1 == references.size()) return pop(version);
-			if (version != NO_VERSION && this->version == version && ind < references.size()) {
-				references[ind] = value;
-				return make_shared<RefNode>(*this);
+			if (version != NO_VERSION && this->version == version && ind < size()) {
+				references[ind] = value; // as long as version is same, can just change data
+				return RefNodePtr(this);
 			}
-			auto size = (ind < references.size()) ? references.size() : ind + 1;
-			auto cp = make_shared<RefNode>(version, size);
-			cp->setReferences(references);
+			auto sz = std::max(size(), ind + 1);
+			auto cp = make_shared<RefNode>(version, sz);
+			for (int i = 0; i < size(); i++) (*cp)[i] = references[i];
 			(*cp)[ind] = value;
 			return cp;
 		}
