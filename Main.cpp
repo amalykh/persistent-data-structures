@@ -1,12 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include "tail_node.h"
-#include "shared.h"
-#include "data_node.h"
-#include "reference_node.h"
-#include "abstract_pv.h"
-#include "persistent_vector.h"
-#include "Log.h"
+#include "PersistentVector/tail_node.h"
+#include "Shared/shared.h"
+#include "PersistentVector/data_node.h"
+#include "PersistentVector/reference_node.h"
+#include "PersistentVector/abstract_pv.h"
+#include "PersistentVector/persistent_vector.h"
+#include "Shared/log.h"
 
 using namespace std;
 using namespace persistent;

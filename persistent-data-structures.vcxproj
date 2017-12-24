@@ -110,15 +110,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="abstract_pv.h" />
-    <ClInclude Include="data_node.h" />
-    <ClInclude Include="Log.h" />
-    <ClInclude Include="nodes_converter.h" />
-    <ClInclude Include="persistent_vector.h" />
-    <ClInclude Include="reference_node.h" />
-    <ClInclude Include="shared.h" />
-    <ClInclude Include="tail_node.h" />
-    <ClInclude Include="vector_persistent_node.h" />
+    <ClInclude Include="PersistentVector\abstract_pv.h" />
+    <ClInclude Include="PersistentVector\data_node.h" />
+    <ClInclude Include="PersistentVector\persistent_vector.h" />
+    <ClInclude Include="PersistentVector\reference_node.h" />
+    <ClInclude Include="PersistentVector\tail_node.h" />
+    <ClInclude Include="PersistentVector\vector_persistent_node.h" />
+    <ClInclude Include="Shared\log.h" />
+    <ClInclude Include="Shared\nodes_converter.h" />
+    <ClInclude Include="Shared\shared.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />

@@ -13,40 +13,40 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\PersistentVector">
-      <UniqueIdentifier>{530f7127-831c-43d3-9725-c632b0f4f7c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Shared">
       <UniqueIdentifier>{edf67dd9-e3a6-40e6-bb4b-d00876d42a85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PersistentVector">
+      <UniqueIdentifier>{ef6f8238-8635-4544-a48b-1ba73bc49fd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shared.h">
+    <ClInclude Include="PersistentVector\abstract_pv.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="PersistentVector\data_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="PersistentVector\reference_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="PersistentVector\vector_persistent_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="PersistentVector\tail_node.h">
+      <Filter>Source Files\PersistentVector</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\log.h">
       <Filter>Source Files\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="tail_node.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="data_node.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="vector_persistent_node.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="reference_node.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="abstract_pv.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="persistent_vector.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="nodes_converter.h">
-      <Filter>Source Files\PersistentVector</Filter>
-    </ClInclude>
-    <ClInclude Include="Log.h">
+    <ClInclude Include="Shared\nodes_converter.h">
       <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\shared.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="PersistentVector\persistent_vector.h">
+      <Filter>Source Files\PersistentVector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
