@@ -6,8 +6,11 @@
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>
 	class DataNode : public PersistentNode<T, Allocator> {
-		using DNodePtr = DataNode<T, Allocator>*;
 		using DNode = DataNode<T, Allocator>;
+		using DNodePtr = shared_ptr<DNode>;
+		T& operator[] (int x) {
+			return data[x];
+		}
 		DataNode(std::vector<T, Allocator>& source_data, VersionID version) : version(version) {
 			data = source_data;
 		}

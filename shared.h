@@ -5,6 +5,8 @@
 
 using std::shared_ptr;
 using std::make_shared;
+using std::static_pointer_cast;
+using std::dynamic_pointer_cast;
 
 namespace persistent {
 	const int32_t C_BITS = 5;

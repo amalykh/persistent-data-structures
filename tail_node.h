@@ -7,9 +7,12 @@
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>
 	class TailNode : public PersistentNode<T, Allocator> {
-		using TNodePtr = TailNode<T, Allocator>*;
 		using TNode = TailNode<T, Allocator>;
+		using TNodePtr = shared_ptr<TNode>;
 	public:
+		T& operator[] (int x) {
+			return data[x];
+		}
 		TailNode(VersionID version) : version(version) {
 			data.resize(C_SIZE);
 		}

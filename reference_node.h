@@ -7,13 +7,15 @@
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>
 	class ReferenceNode : public PersistentNode<T, Allocator> {
-		using RefNodePtr = ReferenceNode<T, Allocator>*;
+		using PersNode = PersistentNode<T, Allocator>;
+		using PersNodePtr = shared_ptr<PersNode>;
 		using RefNode = ReferenceNode<T, Allocator>;
+		using RefNodePtr = shared_ptr<RefNode>;
 		ReferenceNode(VersionID version) : version(version) {}
 		ReferenceNode(VersionID version, int size) : ReferenceNode(version) {
 			references.resize(size);
 		}
-		RefNodePtr CreateWithItems(VersionID version, std::vector<PersistentNode<T, Allocator>, Allocator> nodes) {
+		static RefNodePtr createWithItems(VersionID version, std::vector<PersNodePtr>& nodes) {
 			RefNodePtr res = make_shared<RefNode>(version);
 			res->setReferences(nodes);
 			return res;
@@ -27,10 +29,10 @@ namespace persistent {
 			cp->setReferences(references);
 			return cp;
 		}
-		RefNodePtr change(int ind, std::vector<T, Allocator>* value, VersionID version) {
+		RefNodePtr change(int ind, PersNodePtr value, VersionID version) {
 			if (value == nullptr && ind + 1 == references.size()) return pop(version);
 			if (version != NO_VERSION && this->version == version && ind < references.size()) {
-				references[ind] = *value;
+				references[ind] = value;
 				return make_shared<RefNode>(*this);
 			}
 			auto size = (ind < references.size()) ? references.size() : ind + 1;
@@ -39,10 +41,11 @@ namespace persistent {
 			(*cp)[ind] = value;
 			return cp;
 		}
-		std::vector<T, Allocator>& getReferences() { return references; }
-		void setReferences(std::vector<T, Allocator> refs) { references = refs; }
+		std::vector<PersNodePtr>& getReferences() { return references; }
+		void setReferences(std::vector<PersNodePtr> refs) { references = refs; }
+		int32_t size() { return references.size(); }
 	private:
-		std::vector<PersistentNode<T, Allocator>, Allocator> references;
+		std::vector<PersNodePtr> references;
 		VersionID version;
 	};
 } // namespace persistent
