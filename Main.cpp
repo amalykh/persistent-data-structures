@@ -7,6 +7,7 @@
 #include "PersistentVector/abstract_pv.h"
 #include "PersistentVector/persistent_vector.h"
 #include "Shared/log.h"
+#include <map>
 
 using namespace std;
 using namespace persistent;
