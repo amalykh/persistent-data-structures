@@ -1,11 +1,11 @@
 #pragma once
 #include "shared.h"
-#include "PersistentVector\vector_persistent_node.h"
+#include "PersistentVector/vector_persistent_node.h"
 #include <memory>
 #include <vector>
-#include "PersistentVector\tail_node.h"
-#include "PersistentVector\reference_node.h"
-#include "PersistentVector\data_node.h"
+#include "PersistentVector/tail_node.h"
+#include "PersistentVector/reference_node.h"
+#include "PersistentVector/data_node.h"
 
 namespace persistent {
 	template<class T, class Allocator = std::allocator<T>>

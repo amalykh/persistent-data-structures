@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 
-#define getHash(x) 14
+#define getHash(x) (std::hash<K>{}(x))
 
 using std::pair;
 using std::vector;

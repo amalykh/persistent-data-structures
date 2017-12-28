@@ -9,6 +9,7 @@
 #include "../PersistentVector/abstract_pv.h"
 #include "../PersistentVector/data_node.h"
 #include "nodes_converter.h"
+#include "PersistentHashMap/persistent_hashmap.h"
 
 namespace persistent {
 	class Log {
