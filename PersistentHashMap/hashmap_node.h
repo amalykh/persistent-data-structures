@@ -3,8 +3,6 @@
 #include "../Shared/shared.h"
 #include "hashmap_persistent_node.h"
 
-#define getHash(x) 14
-
 namespace persistent {
 	template<class K, class V, class Allocator = std::allocator<pair<K, V>>>
 	class MapNode : public MPersistentNode<K, V, Allocator> {
@@ -43,8 +41,8 @@ namespace persistent {
 		}
 		bool isKeyAt(int idx, NodeState state, K& key) {
 			return (state == M_Value)
-				? values[valuePosition(idx)].first == key;
-			: collisions[collisionPosition(idx)].hasItemWithKey(key);
+				? values[valuePosition(idx)].first == key
+          : collisions[collisionPosition(idx)].hasItemWithKey(key);
 		}
 		MPNPtr getReferenceAt(int i) {
 			return references[referencePosition(i)];
@@ -105,12 +103,12 @@ namespace persistent {
 			auto v_index = valuePosition(i);
 			auto new_values = removeFromValues(vIndex);
 			auto new_collisions = collisions;
-			new_collisions.insert(new_collisions.begin() + c_index, createCollisionCollection(version, values[vIndex], { key, value }));
+      new_collisions.insert(new_collisions.begin() + c_index, createCollisionCollection(version, {values[v_index], { key, value } }));
 			auto new_references = references;
 
 			return make_shared<MPN>(
 				new_values, new_collisions, new_references, vBitmap & ~pos,
-				cBitmap & | pos, rBitmap, version);
+				cBitmap | pos, rBitmap, version);
 		}
 		MPNPtr createReference(int i, MPNPtr mapNode, NodeState state, VersionID version) {
 			auto pos = 1u << i;
@@ -197,7 +195,7 @@ namespace persistent {
 				// On index oldIdx is value
 				auto this_value = values[valuePosition(oldIdx)];
 				auto res = make_shared<MPN>();
-				res->setValues((idx1 < idx2) ? {other_value, this_value} : {this_value, other_value});
+				res->setValues((idx1 < idx2) ? ({other_value, this_value}) : ({this_value, other_value}));
 				res->setvBitmap((1u << idx1) | (1u << idx2));
 				res->setVersion(version);
 				return res;
@@ -205,23 +203,24 @@ namespace persistent {
 			else {
 				// On index oldIdx is collision collection
 				auto c_index = CollisionPosition(oldIdx);
-				auto this_value = collisions[cIndex];
+				auto this_value = collisions[c_index];
 				auto res = make_shared<MPN>();
 				res->setValues({ other_value });
 				res->setvBitmap((1u << idx2));
 				res->setVersion(version);
-				res->setCollisions({ thisValue });
+				res->setCollisions({ this_value });
 				return res;
 			}
 		}
 		int32_t getHashCodeAt(int idx, NodeState state) {
-			return (state == M_Value) ? values[valuePosition(idx)].first.GetHashCode() : collisions[collisionPosition(idx)].getHash();
+			return (state == M_Value) ? geteHash(values[valuePosition(idx)].first) : collisions[collisionPosition(idx)].mpcHash();
 		}
-		MPNPtr CreateReferenceNode(int idx, MPNPtr node, VersionID version) {
+		MPNPtr createReferenceNode(int idx, MPNPtr node, VersionID version) {
 			auto res = make_shared<MPN>();
 			res->setrBitmap(1u << idx);
 			res->setReferences({ node });
 			res->setVersion(version);
+      return res;
 		}
 		MPNPtr removeValue(int idx, NodeState state, K& key, VersionID version) {
 			auto pos = 1u << idx;
@@ -278,6 +277,90 @@ namespace persistent {
 				new_values, new_collisions, new_references, new_vBitmap,
 				new_cBitmap, rBitmap, version);
 		}
+    
+    MPNPtr merge(MPNPtr new_node, int index, VersionID version)
+    {
+      auto pos = 1u << index;
+      
+      auto map_node = dynamic_pointer_cast<MPN>(new_node);
+      assert(map_node);
+      
+      auto new_collisions = collisions;
+      auto new_values = values;
+      auto new_references = removeFromReferences(referencePosition(index));
+      
+      auto new_cBitmap = cBitmap;
+      auto new_vBitmap = vBitmap;
+      auto new_rBitmap = rBitmap & ~pos;
+      
+      if (!map_node->getValues().empty()) {
+        auto vp = map_node->getValues()[0];
+        new_values = addToValues(valuePosition(index), vp.first, vp.second);
+        new_vBitmap |= pos;
+      }
+      else {
+        auto collision = map_node->getCollisions()[0];
+        new_collisions = addToCollisions(collisionPosition(index), collision);
+        new_cBitmap |= pos;
+      }
+      
+      if (version != NO_VERSION) {
+        if (this->version == version) {
+          vBitmap = new_vBitmap;
+          cBitmap = new_cBitmap;
+          rBitmap = new_rBitmap;
+          
+          values = new_values;
+          collisions = new_collisions;
+          references = new_references;
+          return make_shared<MPNPtr>(*this);
+        }
+        
+        new_values = values;
+        new_collisions = collisions;
+      }
+      return make_shared<MPN>(
+            new_values, new_collisions, new_references, new_vBitmap,
+            new_cBitmap, rBitmap, version);
+    }
+    
+    MPNPtr makeRoot(VersionID version = NO_VERSION) {
+      auto new_cBitmap = cBitmap;
+      auto new_vBitmap = vBitmap;
+      
+      if (!values.empty()) {
+        auto idx = ((getHash(values[0].first)) & ABITS);
+        new_vBitmap = 1u << idx;
+      }
+      else {
+        auto idx = ((getHash(collisions[0].first)) & ABITS);
+        new_cBitmap = 1u << idx;
+      }
+      
+      auto new_values = values;
+      auto new_collisions = collisions;
+      
+      if (version != NO_VERSION) {
+        if (this->version == version) {
+          vBitmap = new_vBitmap;
+          cBitmap = new_cBitmap;
+          return make_shared<MPNPtr>(*this);
+        }
+        else
+        {
+          new_values = values;
+          new_collisions = collisions;
+        }
+      }
+      auto res = make_shared<MPN>();
+      res->setvBitmap(new_vBitmap);
+      res->setcBitmap(new_cBitmap);
+      res->setVersion(version);
+      res->setValues(new_values);
+      res->setCollisions(new_collisions);
+      return res;
+    }
+    
 		void setValues(vector<pair<K, V>, Allocator>& v) { values = v; }
 		void setCollisions(vector<MPCPtr>& c) { collisions = c; }
 		void setReferences(vector<MPNPtr>& r) { references = r; }
@@ -285,6 +368,12 @@ namespace persistent {
 		void setrBitmap(uint32_t rb) { rBitmap = rb; }
 		void setcBitmap(uint32_t cb) { cBitmap = cb; }
 		void setVersion(VersionID v) { version = v; }
+    vector<pair<K, V>, Allocator>& getValues() { return values; }
+    vector<MPCPtr>& getCollisions(){ return collisions; }
+    vector<MPNPtr>& getReferences(){ return references; }
+    uint32_t& getVBitmap(){ return vBitmap; }
+    uint32_t& getRBitmap(){ return rBitmap; }
+    uint32_t& getCBitmap(){ return cBitmap; }
 	private:
 		vector<pair<K, V>, Allocator> values;
 		vector<MPCPtr> collisions;
@@ -342,7 +431,7 @@ namespace persistent {
 			res.erase(res.begin() + index);
 			return res;
 		}
-		MapNode<K, V>[] RemoveFromReferences(int index) {
+		vector<MPNPtr> removeFromReferences(int index) {
 			auto res = references;
 			res.erase(res.begin() + index);
 			return res;

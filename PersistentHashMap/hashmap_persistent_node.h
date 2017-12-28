@@ -4,6 +4,8 @@
 #include <utility>
 #include <vector>
 
+#define getHash(x) 14
+
 using std::pair;
 using std::vector;
 
@@ -33,9 +35,10 @@ namespace persistent {
 		virtual MPNPtr createCollisionAt(int i, K& key, V& value, VersionID version) = 0;
 		virtual MPNPtr addToColisionAt(int i, K& key, V& value, VersionID version) = 0;
 		virtual MapNodeRelation relationWithNodeAt(K& key, int idx, NodeState state) = 0;
-		virtual MPNPtr ñhangeReference(int idx, MPNPtr mapNode, VersionID version) = 0;
-		virtual MPNPtr ñreateNewNodeFrom(int oldIdx, K& key, V& value, int idx1, int idx2, VersionID version) = 0;
-		virtual MPNPtr ñreateReference(int index, MPNPtr mapNode, NodeState state, VersionID version) = 0;
+		virtual MPNPtr changeReference(int idx, MPNPtr mapNode, VersionID version) = 0;
+		virtual MPNPtr createNewNodeFrom(int oldIdx, K& key, V& value, int idx1, int idx2, VersionID version) = 0;
+		virtual MPNPtr createReference(int index, MPNPtr mapNode, NodeState state, VersionID version) = 0;
+    virtual int32_t getHashCodeAt(int idx, NodeState state) = 0;
 		virtual MPNPtr createReferenceNode(int idx, MPNPtr node, VersionID version) = 0;
 		virtual MPNPtr changeValue(int idx, NodeState state, K& key, V& value, VersionID version) = 0;
 		virtual bool isKeyAt(int idx, NodeState state, K key) = 0;
@@ -44,6 +47,7 @@ namespace persistent {
 		virtual MPNPtr removeValue(int idx, NodeState state, K& key, VersionID version) = 0;
 		virtual MPNPtr merge(MPNPtr newNode, int index, VersionID version) = 0;
 		virtual MPNPtr makeRoot(VersionID version) = 0;
+    virtual ~MPersistentNode() = 0;
 	};
 
 	template<class K, class V, class Allocator = std::allocator<pair<K, V>>>
@@ -51,7 +55,7 @@ namespace persistent {
 		using MPC = MPersistentNode <K, V, Allocator>;
 		using MPCPtr = shared_ptr<MPC>;
 	public:
-		virtual int32_t getHash() = 0;
+		virtual int32_t mpcHash() = 0;
 		virtual MPCPtr add(K& key, V& item, VersionID version) = 0;
 		virtual MPCPtr remove(K& key, VersionID version) = 0;
 		virtual MPCPtr change(K& key, V& value, VersionID version) = 0;
